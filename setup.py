@@ -10,8 +10,6 @@ setup(
         'certbot',
         'redis',
         'pycrypto',
-        'ssl',
-        'subprocess',
         'zope.interface',
     ],
     entry_points = {
