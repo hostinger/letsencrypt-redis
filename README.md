@@ -7,5 +7,5 @@ certbot run -d example.com -a letsencrypt-redis:auth --letsencrypt-redis:auth-re
 ### Install key/cert pair into local Redis
 
 ```
-certbot run -d a.donatas.net -a standalone -i letsencrypt-redis:installer -n --force-renewal
+certbot run -d example.com -a standalone -i letsencrypt-redis:installer -n --force-renewal
 ```
