@@ -1,15 +1,16 @@
 """Redis Let's Encrypt installer plugin."""
 import logging
 import redis
+import ssl
 
 import zope.component
 import zope.interface
 
-from acme import challenges
-
 from letsencrypt import errors
 from letsencrypt import interfaces
 from letsencrypt.plugins import common
+
+from Crypto.PublicKey import RSA
 
 logger = logging.getLogger(__name__)
 
@@ -24,10 +25,7 @@ class Installer(common.Plugin):
         add("redis-hosts", default="127.0.0.1",
             help="Redis host to store key/cert pair.")
         add("redis-port", default=6379,
-            help="Redis port to store key/cert pari.")
-
-    def __init__(self, *args, **kwargs):
-        super(Installer, self).__init__(*args, **kwargs)
+            help="Redis port to store key/cert pair.")
 
     def prepare(self):  # pylint: disable=missing-docstring,no-self-use
         pass  # pragma: no cover
@@ -38,19 +36,22 @@ class Installer(common.Plugin):
     def get_all_names(self):  # pylint: disable=missing-docstring,no-self-use
         pass  # pragma: no cover
 
-    def deploy_cert(self, domain, cert_path, key_path, chain_path, fullchain_path):
-        # put key/cert to Redis hosts
+    def deploy_cert(self, domain, cert_path, key_path, chain_path, fullchain_path=None):
+        # put key/cert to Redis hosts as binary (DER)
 
-        value = {
-            "key": open(key_path).read(),
-            "cert": open(cert_path).read()
+        pem_key = RSA.importKey(open(key_path).read())
+        key = pem_key.publickey().exportKey("DER")
+
+        cert = ssl.PEM_cert_to_DER_cert(open(cert_path).read())
+
+        values = {
+            "key": key,
+            "cert": cert
         }
 
         for host in self.conf("redis-hosts").split(","):
           r = redis.Redis(host, self.conf("redis-port"))
-          r.hmset("ssl:" + domain,
-                  value,
-                  self.conf("redis-expire"))
+          r.hmset("ssl:" + domain, values)
 
     def enhance(self, domain, enhancement, options=None):  # pylint: disable=missing-docstring,no-self-use
         pass  # pragma: no cover
