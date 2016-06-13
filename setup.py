@@ -8,6 +8,7 @@ setup(
     packages = find_packages(),
     install_requires = [
         'certbot',
+        'redis',
         'zope.interface',
     ],
     entry_points = {
