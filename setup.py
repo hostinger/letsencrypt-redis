@@ -3,13 +3,15 @@ from setuptools import find_packages
 
 setup(
     name = 'letsencrypt-redis',
-    version = '0.0.1',
+    version = '0.0.6',
     description = 'Add challenge token to Redis',
     packages = find_packages(),
     install_requires = [
         'certbot',
         'redis',
         'pycrypto',
+        'ssl',
+        'subprocess',
         'zope.interface',
     ],
     entry_points = {
