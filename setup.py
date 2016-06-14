@@ -11,7 +11,6 @@ setup(
     install_requires = [
         'certbot',
         'redis',
-        'pycrypto',
         'zope.interface',
     ],
     entry_points = {
